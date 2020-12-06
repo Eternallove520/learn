@@ -1,0 +1,16 @@
+openssl x509 -in client.pem -noout -text
+openssl rsa -pubout -in /etc/apiserver-client.key
+
+
+openssl genrsa -out devuser.key 2048;
+openssl req -new -key devuser.key -out devuser.csr -subj "/CN=devuser"
+openssl x509 -req -in devuser.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out devuser.crt -days 3650
+openssl x509 -in devuser.crt -text -noout
+
+
+curl -k --cert ./client.pem --key ./client-key.pem  https://10.25.59.11:7443/api/v1/pods
+
+curl -k --key ./client-key.pem --cert ./client.pem https://10.25.59.11:7443/api/v1/nodes
+
+curl --cert ./client.crt --key ./client.key --cacert /etc/kubernetes/pki/ca.crt -s  https://10.25.59.11:7443/api/v1/namespaces/test/pods
+
